@@ -1,0 +1,80 @@
+<?php
+session_start();
+require_once __DIR__ . '/includes/db.php';
+
+if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'resident') {
+    header("Location: authentication/loginform.php");
+    exit();
+}
+
+$db = new Database();
+$conn = $db->connect();
+
+$stmt = $conn->prepare("SELECT fname, lname, purok FROM Residents WHERE user_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$resident = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$resident) {
+    echo "<p style='color:red;'>Resident details not found. Please contact the administrator.</p>";
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resident Dashboard</title>
+  <link rel="stylesheet" href="./css/resident_dashboard.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="path/to/logo.png" alt="Logo">
+      </div>
+      <div class="profile">
+        <img src="path/to/avatar.jpg" alt="Profile Pic">
+        <h3>John Ervin</h3>
+        <span class="badge">Resident</span>
+      </div>
+      <nav class="nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Documents</a>
+        <a href="#">Request History</a>
+        <a href="#">Account</a>
+      </nav>
+      <a href="../authentication/logout.php" class="logout">Log Out</a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <section class="intro">
+        <h1>Request Community Documents With Ease</h1>
+        <p>Submit document requests directly from your dashboard and stay updated.</p>
+        <a href="reportincident.php" class="btn-primary">Request Now</a>
+      </section>
+
+      <section class="announcement-area">
+        <div class="card announcement">
+          <h2>Announcement</h2>
+          <p>Please be advised that local government offices may have adjusted hours. Always check before visiting.</p>
+        </div>
+        <div class="card days">
+          <h2>Transaction Days</h2>
+          <ul>
+            <li>Mon–Wed: 7:00 AM – 11:50 AM</li>
+            <li>Thu–Fri: No in-person transaction</li>
+            <li>Online requests accepted daily</li>
+          </ul>
+        </div>
+      </section>
+
+  
+    </main>
+  </div>
+</body>
+</html>
