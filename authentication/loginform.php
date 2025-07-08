@@ -1,3 +1,14 @@
+<?php
+require_once '../includes/CsrfToken.php';
+$csrfToken = CsrfToken::generate();
+
+$alert = '';
+if (isset($_GET['timeout'])) {
+    $alert = "You have been logged out due to inactivity.";
+} elseif (isset($_GET['error'])) {
+    $alert = htmlspecialchars($_GET['error'], ENT_QUOTES);
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -5,7 +16,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-
     <style>
         body, h2, form {
             margin: 0;
@@ -124,38 +134,51 @@
     </style>
 </head>
 <body>
-    <?php
-   
-    $alert = '';
-    if (isset($_GET['timeout'])) {
-        $alert = "You have been logged out due to inactivity.";
-    } elseif (isset($_GET['error'])) {
-        $alert = htmlspecialchars($_GET['error'], ENT_QUOTES);
-    }
-
-    if ($alert) {
-        echo "<script>window.onload = function() { alert('$alert'); };</script>";
-    }
-    ?>
-
-
+    <?php if ($alert): ?>
+    <script>
+    window.onload = function() {
+        alert(<?= json_encode($alert) ?>);
+    };
+    </script>
+    <?php endif; ?>
+  
     <form action="login.php" method="POST">
         <h2>LOGIN TO YOUR ACCOUNT <span>Enter your details here</span></h2>
-
+      <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+      
         <div class="form-group">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+           <input type="text" id="username" name="username" autocomplete="off" required
+            value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') : ''; ?>">
         </div>
 
         <div class="form-group">
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" autocomplete="off" required>
         </div>
 
         <button type="submit" name="login">Login</button>
 
         <p>Don't have an account? <a href="signupform.php">Sign up here</a></p>
     </form>
+
+    <script>
+    document.querySelector("form").addEventListener("submit", function(e) {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (username === "" || password === "") {
+        alert("Username and password cannot be empty.");
+        e.preventDefault();
+        return;    }
+
+    if (password.length < 8) {
+        alert("Password must be at least 8 characters.");
+        e.preventDefault();
+        return;
+    }
+});
+</script>
 
 </body>
 </html>

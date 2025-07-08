@@ -135,7 +135,7 @@ $incidents = $incidentReport->getAllIncidents();
         var map<?= $incident['incident_id'] ?> = L.map('map_<?= $incident['incident_id'] ?>').setView([<?= $incident['latitude'] ?>, <?= $incident['longitude'] ?>], 15);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: ''
         }).addTo(map<?= $incident['incident_id'] ?>);
 
         var marker = L.marker([<?= $incident['latitude'] ?>, <?= $incident['longitude'] ?>]).addTo(map<?= $incident['incident_id'] ?>)

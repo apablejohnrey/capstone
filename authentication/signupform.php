@@ -36,7 +36,7 @@
 
     <div class="form-group">
         <label>Contact Number:</label>
-        <input type="text" name="contact_number">
+        <input type="number" name="contact_number">
     </div>
 
     <div class="form-group">

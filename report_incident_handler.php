@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: loginform.php");
+    header("Location: authentication/loginform.php");
     exit();
 }
 

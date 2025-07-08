@@ -7,7 +7,9 @@ CREATE TABLE Users (
   username VARCHAR(100) UNIQUE,
   password VARCHAR(255), 
   status ENUM('Active', 'Inactive'),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  failed_attempts INT DEFAULT 0,
+  lockout_time DATETIME NULL
 );
 
 CREATE TABLE Residents (
@@ -36,7 +38,7 @@ CREATE TABLE Tanods (
   user_id INT UNIQUE, 
   name VARCHAR(255),
   contact_number VARCHAR(20),
-  assigned_area VARCHAR(255),
+  assigned_area VARCHAR(255),//remove this//
   created_at TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
@@ -109,10 +111,44 @@ CREATE TABLE incident_evidence (
     FOREIGN KEY (uploaded_by) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
-INSERT INTO categories (category_name, urgency_level)
-VALUES 
-    ('Fire', 'High'),
-    ('Flood', 'High'),
-    ('Medical Emergency', 'High'),
-    ('Road Accident', 'High');
 
+CREATE TABLE login_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255),
+    ip_address VARCHAR(45) NOT NULL,
+    status ENUM('success', 'invalid_password', 'no_user', 'locked') NOT NULL,
+    attempt_time DATETIME NOT NULL,
+    user_agent TEXT
+);
+
+
+CREATE TABLE Patrol_Schedule (
+  schedule_id INT AUTO_INCREMENT PRIMARY KEY,
+  tanod_id INT NOT NULL,
+  area ENUM('Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6', 'Purok 7') NOT NULL,
+  patrol_date DATE NOT NULL,
+  time_from TIME NOT NULL,
+  time_to TIME NOT NULL,
+  status ENUM('Scheduled', 'Completed', 'Missed') DEFAULT 'Scheduled',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (tanod_id) REFERENCES Tanods(tanod_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE tanod_location (
+  location_id INT AUTO_INCREMENT PRIMARY KEY,
+  tanod_id INT NOT NULL,
+  latitude DECIMAL(9,6) NOT NULL,
+  longitude DECIMAL(9,6) NOT NULL,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (tanod_id) REFERENCES Tanods(tanod_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Notifications (
+    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);

@@ -38,25 +38,25 @@ if (!$resident) {
 <body>
   <div class="container">
 
-  <aside class="sidebar">
-      <div class="logo" style="margin-left: 55px; width: 45%;">
-        <img src="../img/logos.png" alt="Logo" style="max-height: 100px;">
-      </div>
-      <div class="profile">
-        <img src="./img/hehe.png" alt="Profile Pic" class="img-fluid rounded-circle" style="width: 70px; height: 70px; margin-top: 20px;">
-        <h3><?php echo htmlspecialchars($resident['fname'] . ' ' . $resident['lname']); ?></h3>
-        <span class="badge bg-primary">Resident</span>
-      </div>
-      <nav class="nav">
-        <a href="resident_dashboard.php">Dashboard</a>
-        <a href="report_history.php">Incident Report History</a>
-        <a href="account.php">Account</a> <br>
+    <aside class="sidebar">
+        <div class="logo" style="margin-left: 55px; width: 45%;">
+          <img src="../img/logos.png" alt="Logo" style="max-height: 100px;">
+        </div>
+        <div class="profile">
+          <img src="./img/hehe.png" alt="Profile Pic" class="img-fluid rounded-circle" style="width: 70px; height: 70px; margin-top: 20px;">
+          <h3 style="margin-left: 10px;"><?php echo htmlspecialchars($resident['fname'] . ' ' . $resident['lname']); ?></h3>
+          <span class="badge bg-primary">Resident</span>
+        </div>
+        <nav class="nav">
+          <a href="resident_dashboard.php">Dashboard</a>
+          <a href="report_history.php">Incident Report History</a>
+          <a href="account.php">Account</a> <br>
 
-      
-      </nav>
-      <a href="../authentication/logout.php" class="logout">
-        <i class="fas fa-sign-out-alt"></i> Log Out
-    </a>
+        
+        </nav>
+        <a href="../authentication/logout.php" class="logout">
+          <i class="fas fa-sign-out-alt"></i> Log Out
+      </a>
 
     </aside>
 
