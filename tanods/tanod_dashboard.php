@@ -2,11 +2,28 @@
 session_start();
 require_once __DIR__ . '/../includes/db.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'tanod') {
+require_once __DIR__ . '/../includes/refresh_user_role.php'; 
+
+refreshUserRole(); 
+
+if (!isset($_SESSION['user_id'])) {
     header("Location: ../authentication/loginform.php");
     exit();
 }
 
+if ($_SESSION['user_type'] !== 'tanod') {
+    switch ($_SESSION['user_type']) {
+        case 'resident':
+            header("Location: ../residents/resident_dashboard.php");
+            break;
+        case 'official':
+            header("Location: ../officials/official_dashboard.php");
+            break;
+        default:
+            header("Location: ../authentication/loginform.php");
+    }
+    exit();
+}
 $db = new Database();
 $conn = $db->connect();
 

@@ -3,13 +3,15 @@ CREATE DATABASE IF NOT EXISTS capstone;
 USE capstone;
 
 CREATE TABLE Users (
-  user_id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT(11) NOT NULL AUTO_INCREMENT,
   username VARCHAR(100) UNIQUE,
-  password VARCHAR(255), 
+  password VARCHAR(255),
   status ENUM('Active', 'Inactive'),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  failed_attempts INT DEFAULT 0,
-  lockout_time DATETIME NULL
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  failed_attempts INT(11) DEFAULT 0,
+  lockout_time DATETIME DEFAULT NULL,
+  role ENUM('resident', 'tanod', 'official') NOT NULL DEFAULT 'resident',
+  PRIMARY KEY (user_id)
 );
 
 CREATE TABLE Residents (
@@ -17,7 +19,7 @@ CREATE TABLE Residents (
   user_id INT UNIQUE,  
   fname VARCHAR(255),
   lname VARCHAR(255),
-  contact_number VARCHAR(20),
+  contact_number VARCHAR(255),
   purok ENUM('Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6', 'Purok 7'),
   created_at TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
@@ -28,7 +30,7 @@ CREATE TABLE Barangay_Officials (
   user_id INT UNIQUE, 
   name VARCHAR(255),
   position ENUM('Secretary', 'Chairperson'),
-  contact_number VARCHAR(20),
+  contact_number VARCHAR(255),
   created_at TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
@@ -37,8 +39,7 @@ CREATE TABLE Tanods (
   tanod_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT UNIQUE, 
   name VARCHAR(255),
-  contact_number VARCHAR(20),
-  assigned_area VARCHAR(255),//remove this//
+  contact_number VARCHAR(255),
   created_at TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
@@ -121,6 +122,12 @@ CREATE TABLE login_logs (
     user_agent TEXT
 );
 
+CREATE TABLE blocked_ips (
+    ip_address VARCHAR(45) NOT NULL PRIMARY KEY,
+    block_until DATETIME NOT NULL
+);
+
+
 
 CREATE TABLE Patrol_Schedule (
   schedule_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -151,4 +158,37 @@ CREATE TABLE Notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE kp_forms (
+  kp_form_id INT AUTO_INCREMENT PRIMARY KEY,
+  incident_id INT NOT NULL,
+  form_type ENUM('KP7', 'KP8', 'KP9', 'KP10', 'KP13', 'KP14', 'KP15', 'KP16', 'KP20', 'KP21') NOT NULL,
+  created_by INT NOT NULL,
+  generated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  file_path VARCHAR(255), -- if saved as PDF or doc
+  FOREIGN KEY (incident_id) REFERENCES incident_reports(incident_id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(user_id)
+);
+
+CREATE TABLE incident_verification_notes (
+    note_id INT AUTO_INCREMENT PRIMARY KEY,
+    incident_id INT NOT NULL,
+    verified_by INT NOT NULL,
+    notes TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (incident_id) REFERENCES incident_reports(incident_id),
+    FOREIGN KEY (verified_by) REFERENCES users(user_id)
+);
+
+
+CREATE TABLE role_change_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    changer_user_id INT NOT NULL,
+    target_user_id INT NOT NULL,
+    old_role ENUM('resident', 'official', 'tanod'),
+    new_role ENUM('resident', 'official', 'tanod'),
+    change_datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (changer_user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (target_user_id) REFERENCES Users(user_id)
 );

@@ -1,6 +1,3 @@
-<?php
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +9,7 @@
 
 <form action="signup.php" method="POST">
 
-<h2>REGISTER YOUR ACCOUNT <br> <span>Enter your details here</span></h2>
+    <h2>REGISTER YOUR ACCOUNT <br> <span>Enter your details here</span></h2>
 
     <div class="form-group">
         <label>Username:</label>

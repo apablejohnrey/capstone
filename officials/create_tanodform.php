@@ -48,7 +48,7 @@ $error = $_GET['error'] ?? '';
     </div>
 
     <button type="submit" class="btn btn-primary">Create Tanod</button>
-    <a href="official_dashboard.php" class="btn btn-secondary">Cancel</a>
+    <a href="manage_accounts.php" class="btn btn-secondary">Cancel</a>
   </form>
 </div>
 </body>

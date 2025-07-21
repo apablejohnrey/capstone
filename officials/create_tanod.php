@@ -1,6 +1,8 @@
 <?php
 session_start();
-require_once __DIR__ . '/../includes/db.php';
+require_once '../includes/db.php';
+require_once '../includes/encryption.php';
+require_once '../includes/';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'official') {
     header("Location: ../authentication/loginform.php");
@@ -9,9 +11,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'official') {
 
 class TanodController {
     private $conn;
+    private $encryptor;
 
     public function __construct(PDO $db) {
         $this->conn = $db;
+        $this->encryptor = new Encryptor(ENCRYPTION_KEY, ENCRYPTION_IV);
     }
 
     public function usernameExists($username): bool {
@@ -22,14 +26,15 @@ class TanodController {
 
     public function createUser($username, $password): int {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->conn->prepare("INSERT INTO Users (username, password, status) VALUES (?, ?, 'Active')");
+        $stmt = $this->conn->prepare("INSERT INTO Users (username, password, role, status) VALUES (?, ?, 'tanod', 'Active')");
         $stmt->execute([$username, $hashed]);
         return $this->conn->lastInsertId();
     }
 
     public function createTanod($user_id, $name, $contact) {
+        $encryptedContact = $this->encryptor->encrypt($contact);
         $stmt = $this->conn->prepare("INSERT INTO Tanods (user_id, name, contact_number) VALUES (?, ?, ?)");
-        $stmt->execute([$user_id, $name, $contact]);
+        $stmt->execute([$user_id, $name, $encryptedContact]);
     }
 
     public function handleCreation($name, $contact, $username, $password) {
@@ -68,6 +73,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     exit();
 }
-
-header("Location: create_tanodform.php");
-exit();
+?>

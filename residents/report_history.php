@@ -27,7 +27,7 @@ $reports = $incidentHandler->getUserIncidentReports($_SESSION['user_id']);
                 <tr>
                     <th>Date & Time</th>
                     <th>Category</th>
-                    <th>Urgency</th>
+                 
                     <th>Location</th>
                     <th>Landmark</th>
                     <th>Status</th>
@@ -38,8 +38,8 @@ $reports = $incidentHandler->getUserIncidentReports($_SESSION['user_id']);
                 <tr>
                     <td><?= htmlspecialchars($report['incident_datetime']) ?></td>
                     <td><?= htmlspecialchars($report['category_name']) ?></td>
-                    <td><?= htmlspecialchars($report['urgency']) ?></td>
-                    <td>Purok <?= htmlspecialchars($report['purok']) ?></td>
+                 
+                    <td> <?= htmlspecialchars($report['purok']) ?></td>
                     <td><?= htmlspecialchars($report['landmark']) ?></td>
                     <td><?= htmlspecialchars($report['status'] ?? 'Pending') ?></td>
                 </tr>

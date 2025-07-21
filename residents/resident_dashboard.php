@@ -2,12 +2,29 @@
 session_start();
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/SessionManager.php';
+require_once __DIR__ . '/../includes/refresh_user_role.php';
 
 $sessionManager = new SessionManager();
 $sessionManager->checkTimeout();
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'resident') {
-  header("Location: ../authentication/loginform.php"); 
+refreshUserRole();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../authentication/loginform.php");
+    exit();
+}
+
+if ($_SESSION['user_type'] !== 'resident') {
+    switch ($_SESSION['user_type']) {
+        case 'official':
+            header("Location: ../officials/official_dashboard.php");
+            break;
+        case 'tanod':
+            header("Location: ../tanods/tanod_dashboard.php");
+            break;
+        default:
+            header("Location: ../authentication/loginform.php");
+    }
     exit();
 }
 

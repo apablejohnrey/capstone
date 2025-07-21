@@ -8,4 +8,5 @@
     </select><br>
     <input type="text" name="contact_number" placeholder="Contact Number" required><br>
     <button type="submit" name="create_official">Create Official</button>
+    <a href="manage_accounts.php" class="btn btn-secondary">Cancel</a>
 </form>

@@ -9,6 +9,10 @@ if (isset($_GET['timeout'])) {
     $alert = htmlspecialchars($_GET['error'], ENT_QUOTES);
 }
 ?>
+<?php if (isset($_GET['message']) && $_GET['message'] === 'RoleChanged'): ?>
+    <div class="alert alert-warning">Your access role was changed. Please log in again.</div>
+<?php endif; ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,6 +20,7 @@ if (isset($_GET['timeout'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         body, h2, form {
             margin: 0;
@@ -156,6 +161,7 @@ if (isset($_GET['timeout'])) {
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" autocomplete="off" required>
         </div>
+        <div class="g-recaptcha" data-sitekey="6LejkH8rAAAAALyaBfv1bG1ZkMXz7TiQjqdQxzwr"></div> 
 
         <button type="submit" name="login">Login</button>
 
