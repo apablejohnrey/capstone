@@ -30,17 +30,14 @@ $conn = $db->connect();
 $user_id = $_SESSION['user_id'];
 $selectedYear = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 
-// Filter variables
 $selectedPurok = $_GET['purok'] ?? '';
 $selectedStatus = $_GET['status'] ?? '';
 $selectedUrgency = $_GET['urgency'] ?? '';
 
-// Unread notifications
 $notificationCountStmt = $conn->prepare("SELECT COUNT(*) FROM Notifications WHERE user_id = ? AND is_read = 0");
 $notificationCountStmt->execute([$user_id]);
 $unreadNotifications = $notificationCountStmt->fetchColumn();
 
-// Filters condition
 $filterSQL = "WHERE YEAR(ir.incident_datetime) = :year";
 $params = ['year' => $selectedYear];
 
@@ -69,7 +66,6 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $incidentsPerMonth[(int)$row['month']] = (int)$row['total'];
 }
 
-// Category Chart
 $categoryLabels = [];
 $categoryCounts = [];
 $stmt = $conn->prepare("
@@ -119,7 +115,6 @@ $recentReports = $recentStmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="notification">
     🔔 <strong>Unread Notifications:</strong> <?= $unreadNotifications ?> 
   </div>
-
   <form method="GET" class="filters">
     <select name="year" class="form-select w-auto">
       <?php for ($y = date('Y'); $y >= date('Y') - 5; $y--): ?>

@@ -192,3 +192,13 @@ CREATE TABLE role_change_logs (
     FOREIGN KEY (changer_user_id) REFERENCES Users(user_id),
     FOREIGN KEY (target_user_id) REFERENCES Users(user_id)
 );
+
+CREATE TABLE sms_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    recipient_name VARCHAR(100),
+    contact_number VARCHAR(15),
+    message TEXT,
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    type ENUM('custom', 'hearing_notice', 'summon', 'alert') NOT NULL
+);

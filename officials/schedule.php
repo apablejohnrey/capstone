@@ -101,7 +101,7 @@ $tanods = $manager->getTanods();
 <body>
 <?php include 'navofficial.php'; ?>
 
-<div class="container mt-4">
+ <div class="main-content-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fas fa-calendar-check me-2"></i>Manage Patrol Schedules</h2>
         <div>

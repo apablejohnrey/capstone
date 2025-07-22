@@ -57,7 +57,7 @@ $incidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </style>
 </head>
 <body>
-<div class="container-fluid">
+<div class="main-content-wrapper">
     <div class="row">
         <div class="col-md-3"><?php include 'navofficial.php'; ?></div>
         <div class="col-md-9 p-4">

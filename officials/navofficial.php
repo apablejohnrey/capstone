@@ -165,10 +165,8 @@ body {
 }
 </style>
 
-<!-- TOGGLE BUTTON -->
 <button id="sidebarToggle">&#9776;</button>
 
-<!-- SIDEBAR STRUCTURE -->
 <div class="sidebar" id="sidebar">
     <div class="logo">
         <img src="../img/logos.png" alt="Logo">
@@ -184,12 +182,12 @@ body {
         <?php if ($_SESSION['user_type'] === 'official'): ?>
             <a href="official_dashboard.php">Dashboard</a>
             <a href="monitor_incidents.php">Monitor Incidents</a>
+            <a href="send_sms_form.php">SMS </a>
             <a href="manage_accounts.php">Manage Accounts</a>
             <?php if ($position === 'secretary'): ?>
                 <a href="documents.php">Documents</a>
             <?php elseif ($position === 'chairperson' || $position === 'captain'): ?>
                 <a href="schedule.php">Patrol Schedules</a>
-                <a href="sms_alerts.php">SMS Alerts</a>
             <?php endif; ?>
             <a href="manage_incident_types.php">Manage Incident Types</a>
         <?php elseif ($_SESSION['user_type'] === 'tanod'): ?>

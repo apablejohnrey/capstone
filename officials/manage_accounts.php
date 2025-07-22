@@ -55,7 +55,7 @@ $tanods = $conn->query("SELECT t.*, u.status FROM Tanods t JOIN Users u ON t.use
     </style>
 </head>
 <body>
-<div class="container-fluid">
+<div class="main-content-wrapper">
     <div class="row">
         <div class="col-md-3">
             <?php include 'navofficial.php'; ?>
