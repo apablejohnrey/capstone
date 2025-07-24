@@ -1,6 +1,6 @@
 <?php
 session_start();
-date_default_timezone_set('Asia/Manila'); 
+date_default_timezone_set('Asia/Manila');
 require_once __DIR__ . '/../includes/db.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'tanod') {
@@ -11,8 +11,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'tanod') {
 $db = new Database();
 $conn = $db->connect();
 
-
-$stmt = $conn->prepare("SELECT tanod_id, name FROM Tanods WHERE user_id = ?");
+// Fixed: Correct column names
+$stmt = $conn->prepare("SELECT tanod_id, fname, lname FROM Tanods WHERE user_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $tanod = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -44,7 +44,6 @@ foreach ($allSchedules as $sched) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +90,7 @@ foreach ($allSchedules as $sched) {
 <div class="main-content">
     <h2 class="mb-4"><i class="fas fa-calendar-alt me-2"></i>My Patrol Schedule</h2>
 
-    <!-- Today -->
+    <!-- Today's Patrols -->
     <h5 class="mb-2 text-primary"><i class="fas fa-clock me-1"></i> Today's Schedule</h5>
     <?php if (count($schedulesToday)): ?>
         <div class="card shadow mb-4">
@@ -133,7 +132,7 @@ foreach ($allSchedules as $sched) {
         </div>
     <?php endif; ?>
 
-    <!-- Upcoming -->
+    <!-- Upcoming Patrols -->
     <h5 class="mb-2 text-success"><i class="fas fa-calendar-plus me-1"></i> Upcoming Patrols</h5>
     <?php if (count($schedulesUpcoming)): ?>
         <div class="card shadow mb-4">
@@ -170,7 +169,7 @@ foreach ($allSchedules as $sched) {
         <p>No upcoming patrols.</p>
     <?php endif; ?>
 
-
+    <!-- Past Patrols -->
     <h5 class="mb-2 text-muted"><i class="fas fa-history me-1"></i> Past Patrols</h5>
     <?php if (count($schedulesPast)): ?>
         <div class="card shadow">

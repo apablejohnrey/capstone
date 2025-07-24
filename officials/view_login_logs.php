@@ -30,13 +30,12 @@ class LoginLogViewer {
     }
 }
 
-// Auth check
+
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'official') {
     header("Location: ../authentication/loginform.php");
     exit;
 }
 
-// Page and DB logic
 $page = max((int)($_GET['page'] ?? 1), 1);
 $database = new Database();
 $db = $database->connect();

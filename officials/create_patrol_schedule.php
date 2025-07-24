@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'official') {
 $db = new Database();
 $conn = $db->connect();
 
-// Check if the user is the Chairperson (Captain)
+// Check if user is Chairperson
 $stmt = $conn->prepare("SELECT position FROM Barangay_Officials WHERE user_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $official = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -29,12 +29,12 @@ class PatrolScheduler {
     }
 
     public function getTanods(): array {
-        $stmt = $this->conn->query("SELECT tanod_id, name FROM Tanods ORDER BY name ASC");
+        $stmt = $this->conn->query("SELECT tanod_id, fname, lname FROM Tanods ORDER BY fname ASC, lname ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function createSchedule($tanodId, $area, $date, $from, $to): string {
-        // Prevent overlapping schedules for the same tanod
+        // Prevent overlapping schedules
         $stmt = $this->conn->prepare("
             SELECT * FROM Patrol_Schedule 
             WHERE tanod_id = ? AND patrol_date = ? 
@@ -80,21 +80,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Create Patrol Schedule</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/navofficial.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .main-content-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 100%;
+        }
+
+        .btn-back {
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<div class="main-content-wrapper">
-    <div class="row">
+    <div class="main-content-wrapper">
         <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 p-0">
+        <div class="sidebar">
             <?php include 'navofficial.php'; ?>
         </div>
 
         <!-- Main Content -->
-        <div class="col-md-9 col-lg-10 p-4">
+        <div class="content container-fluid">
             <h2 class="mb-4">Create Patrol Schedule</h2>
+
+            <a href="schedule.php" class="btn btn-secondary btn-back">← Back to Schedules</a>
 
             <?php if ($message): ?>
                 <div class="alert alert-info"><?= htmlspecialchars($message) ?></div>
@@ -108,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <option value="">-- Choose Tanod --</option>
                             <?php foreach ($tanods as $tanod): ?>
                                 <option value="<?= $tanod['tanod_id'] ?>">
-                                    <?= htmlspecialchars($tanod['name']) ?>
+                                    <?= htmlspecialchars($tanod['fname'] . ' ' . $tanod['lname']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -146,7 +181,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
-</div>
-
 </body>
 </html>

@@ -16,9 +16,10 @@ CREATE TABLE Users (
 
 CREATE TABLE Residents (
   resident_id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT UNIQUE,  
+  user_id INT UNIQUE,
   fname VARCHAR(255),
   lname VARCHAR(255),
+  email VARCHAR(255),
   contact_number VARCHAR(255),
   purok ENUM('Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6', 'Purok 7'),
   created_at TIMESTAMP,
@@ -27,19 +28,25 @@ CREATE TABLE Residents (
 
 CREATE TABLE Barangay_Officials (
   official_id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT UNIQUE, 
-  name VARCHAR(255),
+  user_id INT UNIQUE,
+  fname VARCHAR(255),
+  lname VARCHAR(255),
+  email VARCHAR(255),
   position ENUM('Secretary', 'Chairperson'),
   contact_number VARCHAR(255),
+  purok ENUM('Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6', 'Purok 7'),
   created_at TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
 CREATE TABLE Tanods (
   tanod_id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT UNIQUE, 
-  name VARCHAR(255),
+  user_id INT UNIQUE,
+  fname VARCHAR(255),
+  lname VARCHAR(255),
+  email VARCHAR(255),
   contact_number VARCHAR(255),
+  purok ENUM('Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6', 'Purok 7'),
   created_at TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
@@ -122,11 +129,6 @@ CREATE TABLE login_logs (
     user_agent TEXT
 );
 
-CREATE TABLE blocked_ips (
-    ip_address VARCHAR(45) NOT NULL PRIMARY KEY,
-    block_until DATETIME NOT NULL
-);
-
 
 
 CREATE TABLE Patrol_Schedule (
@@ -158,17 +160,6 @@ CREATE TABLE Notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
-);
-
-CREATE TABLE kp_forms (
-  kp_form_id INT AUTO_INCREMENT PRIMARY KEY,
-  incident_id INT NOT NULL,
-  form_type ENUM('KP7', 'KP8', 'KP9', 'KP10', 'KP13', 'KP14', 'KP15', 'KP16', 'KP20', 'KP21') NOT NULL,
-  created_by INT NOT NULL,
-  generated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  file_path VARCHAR(255), -- if saved as PDF or doc
-  FOREIGN KEY (incident_id) REFERENCES incident_reports(incident_id) ON DELETE CASCADE,
-  FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
 
 CREATE TABLE incident_verification_notes (

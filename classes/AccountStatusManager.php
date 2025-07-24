@@ -7,7 +7,6 @@ class AccountStatusManager {
     }
 
     public function toggleStatus(int $userId, string $password, int $changerId): bool {
-        // Fetch actual password
         $stmt = $this->conn->prepare("SELECT password, status FROM Users WHERE user_id = ?");
         $stmt->execute([$changerId]);
         $changer = $stmt->fetch(PDO::FETCH_ASSOC);

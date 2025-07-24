@@ -46,18 +46,18 @@ class AccountManager {
         return $result;
     }
 
-    public function updateAccount(string $name, string $contact, Encryptor $encryptor, ?string $position = null): void {
+    public function updateAccount(string $fname, string $lname, string $contact, Encryptor $encryptor, ?string $position = null): void {
         $encrypted = $encryptor->encrypt($contact);
 
         if ($this->role === 'resident') {
-            $stmt = $this->conn->prepare("UPDATE Residents SET fname = ?, contact_number = ? WHERE user_id = ?");
-            $stmt->execute([$name, $encrypted, $this->userId]);
+            $stmt = $this->conn->prepare("UPDATE Residents SET fname = ?, lname = ?, contact_number = ? WHERE user_id = ?");
+            $stmt->execute([$fname, $lname, $encrypted, $this->userId]);
         } elseif ($this->role === 'official') {
-            $stmt = $this->conn->prepare("UPDATE Barangay_Officials SET name = ?, contact_number = ?, position = ? WHERE user_id = ?");
-            $stmt->execute([$name, $encrypted, $position, $this->userId]);
+            $stmt = $this->conn->prepare("UPDATE Barangay_Officials SET fname = ?, lname = ?, contact_number = ?, position = ? WHERE user_id = ?");
+            $stmt->execute([$fname, $lname, $encrypted, $position, $this->userId]);
         } else {
-            $stmt = $this->conn->prepare("UPDATE {$this->table} SET name = ?, contact_number = ? WHERE user_id = ?");
-            $stmt->execute([$name, $encrypted, $this->userId]);
+            $stmt = $this->conn->prepare("UPDATE Tanods SET fname = ?, lname = ?, contact_number = ? WHERE user_id = ?");
+            $stmt->execute([$fname, $lname, $encrypted, $this->userId]);
         }
     }
 
@@ -80,16 +80,16 @@ class AccountManager {
 
         switch ($newRole) {
             case 'resident':
-                $stmt = $this->conn->prepare("INSERT INTO Residents (user_id, fname, lname, contact_number, purok) VALUES (?, ?, '', ?, 'Purok 1')");
-                $stmt->execute([$this->userId, $account['name'] ?? $account['fname'], $encrypted]);
+                $stmt = $this->conn->prepare("INSERT INTO Residents (user_id, fname, lname, contact_number, purok) VALUES (?, ?, ?, ?, 'Purok 1')");
+                $stmt->execute([$this->userId, $account['fname'], $account['lname'], $encrypted]);
                 break;
             case 'tanod':
-                $stmt = $this->conn->prepare("INSERT INTO Tanods (user_id, name, contact_number) VALUES (?, ?, ?)");
-                $stmt->execute([$this->userId, $account['name'] ?? $account['fname'], $encrypted]);
+                $stmt = $this->conn->prepare("INSERT INTO Tanods (user_id, fname, lname, contact_number, purok) VALUES (?, ?, ?, ?, 'Purok 1')");
+                $stmt->execute([$this->userId, $account['fname'], $account['lname'], $encrypted]);
                 break;
             case 'official':
-                $stmt = $this->conn->prepare("INSERT INTO Barangay_Officials (user_id, name, position, contact_number) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$this->userId, $account['name'] ?? $account['fname'], $position, $encrypted]);
+                $stmt = $this->conn->prepare("INSERT INTO Barangay_Officials (user_id, fname, lname, contact_number, position, purok) VALUES (?, ?, ?, ?, ?, 'Purok 1')");
+                $stmt->execute([$this->userId, $account['fname'], $account['lname'], $encrypted, $position]);
                 break;
             default:
                 throw new Exception("Invalid role.");
@@ -117,7 +117,7 @@ $account['contact_number'] = $encryptor->decrypt($account['contact_number'] ?? '
 $currentPosition = $account['position'] ?? null;
 
 if (isset($_POST['update'])) {
-    $manager->updateAccount(trim($_POST['name']), trim($_POST['contact']), $encryptor, $_POST['position'] ?? null);
+    $manager->updateAccount(trim($_POST['fname']), trim($_POST['lname']), trim($_POST['contact']), $encryptor, $_POST['position'] ?? null);
     header("Location: manage_accounts.php");
     exit();
 }
@@ -144,43 +144,37 @@ if (isset($_POST['confirm_change'])) {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Edit Account</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .card {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .form-section-title {
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-    </style>
 </head>
 <body>
 <div class="container mt-5">
     <div class="card p-4">
-        <h3 class="mb-4">Edit <?= ucfirst($role) ?> Account</h3>
+        <h3>Edit <?= ucfirst($role) ?> Account</h3>
 
         <?php if (!empty($error)): ?>
             <div class="alert alert-danger"><?= $error ?></div>
         <?php endif; ?>
 
-        <h5 class="form-section-title">Update Information</h5>
         <form method="post">
-            <div class="mb-3">
-                <label class="form-label">Full Name</label>
-                <input type="text" name="name" required class="form-control" value="<?= htmlspecialchars($account['name'] ?? $account['fname']) ?>">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">First Name</label>
+                    <input type="text" name="fname" class="form-control" value="<?= htmlspecialchars($account['fname']) ?>" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" name="lname" class="form-control" value="<?= htmlspecialchars($account['lname']) ?>" required>
+                </div>
             </div>
             <div class="mb-3">
                 <label class="form-label">Contact Number</label>
-                <input type="text" name="contact" required class="form-control" value="<?= htmlspecialchars($account['contact_number']) ?>">
+                <input type="text" name="contact" class="form-control" value="<?= htmlspecialchars($account['contact_number']) ?>" required>
             </div>
             <?php if ($role === 'official'): ?>
                 <div class="mb-3">
@@ -191,15 +185,12 @@ if (isset($_POST['confirm_change'])) {
                     </select>
                 </div>
             <?php endif; ?>
-            <div class="d-flex gap-2">
-                <button type="submit" name="update" class="btn btn-primary">Update</button>
-                <a href="manage_accounts.php" class="btn btn-secondary">Cancel</a>
-            </div>
+            <button type="submit" name="update" class="btn btn-primary">Update</button>
+            <a href="manage_accounts.php" class="btn btn-secondary">Cancel</a>
         </form>
 
-        <hr class="my-4">
+        <hr>
 
-        <h5 class="form-section-title">Change Role</h5>
         <form onsubmit="event.preventDefault(); openConfirmModal();">
             <div class="row g-3 align-items-end">
                 <div class="col-md-6">
@@ -221,9 +212,8 @@ if (isset($_POST['confirm_change'])) {
                     </select>
                 </div>
             </div>
-            <div class="mt-3 d-flex gap-2">
+            <div class="mt-3">
                 <button type="submit" class="btn btn-danger">Change Role</button>
-                <a href="manage_accounts.php" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>

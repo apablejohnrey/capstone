@@ -2,7 +2,7 @@
 session_start();
 require_once '../includes/db.php';
 require_once '../includes/encryption.php';
-require_once '../includes/';
+
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'official') {
     header("Location: ../authentication/loginform.php");
@@ -31,32 +31,35 @@ class TanodController {
         return $this->conn->lastInsertId();
     }
 
-    public function createTanod($user_id, $name, $contact) {
+    public function createTanod($user_id, $fname, $lname, $email, $contact, $purok) {
         $encryptedContact = $this->encryptor->encrypt($contact);
-        $stmt = $this->conn->prepare("INSERT INTO Tanods (user_id, name, contact_number) VALUES (?, ?, ?)");
-        $stmt->execute([$user_id, $name, $encryptedContact]);
+        $stmt = $this->conn->prepare("INSERT INTO Tanods (user_id, fname, lname, email, contact_number, purok, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+        $stmt->execute([$user_id, $fname, $lname, $email, $encryptedContact, $purok]);
     }
 
-    public function handleCreation($name, $contact, $username, $password) {
+    public function handleCreation($fname, $lname, $email, $contact, $purok, $username, $password) {
         if ($this->usernameExists($username)) {
             return ['error' => 'Username already exists.'];
         }
 
         $user_id = $this->createUser($username, $password);
-        $this->createTanod($user_id, $name, $contact);
+        $this->createTanod($user_id, $fname, $lname, $email, $contact, $purok);
 
         return ['success' => 'Tanod account created successfully.'];
     }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim($_POST['name']);
+    $fname = trim($_POST['fname']);
+    $lname = trim($_POST['lname']);
+    $email = trim($_POST['email']);
     $contact = trim($_POST['contact_number']);
+    $purok = $_POST['purok'];
     $username = trim($_POST['username']);
     $password = $_POST['password'];
 
-    if (!$name || !$contact || !$username || !$password) {
-        header("Location: create_tanodform.php?error=Please fill in all fields.");
+    if (!$fname || !$lname || !$email || !$contact || !$purok || !$username || !$password) {
+        header("Location: create_tanodform.php?error=" . urlencode("Please fill in all fields."));
         exit();
     }
 
@@ -64,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn = $db->connect();
     $controller = new TanodController($conn);
 
-    $result = $controller->handleCreation($name, $contact, $username, $password);
+    $result = $controller->handleCreation($fname, $lname, $email, $contact, $purok, $username, $password);
 
     if (isset($result['error'])) {
         header("Location: create_tanodform.php?error=" . urlencode($result['error']));
@@ -73,4 +76,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     exit();
 }
-?>

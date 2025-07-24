@@ -16,7 +16,7 @@ $position = '';
 $profilePhoto = '../img/default.png'; // fallback
 
 if ($_SESSION['user_type'] === 'official') {
-    $stmt = $conn->prepare("SELECT name, position FROM Barangay_Officials WHERE user_id = ?");
+    $stmt = $conn->prepare("SELECT CONCAT(fname, ' ', lname) AS name, position FROM Barangay_Officials WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $official = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -35,7 +35,7 @@ if ($_SESSION['user_type'] === 'official') {
     }
 
 } elseif ($_SESSION['user_type'] === 'tanod') {
-    $stmt = $conn->prepare("SELECT name FROM Tanods WHERE user_id = ?");
+    $stmt = $conn->prepare("SELECT CONCAT(fname, ' ', lname) AS name FROM Tanods WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $tanod = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -49,6 +49,7 @@ if ($_SESSION['user_type'] === 'official') {
     $profilePhoto = '../img/tanod.png';
 }
 ?>
+
 
 <!-- SIDEBAR STYLE -->
 <style>

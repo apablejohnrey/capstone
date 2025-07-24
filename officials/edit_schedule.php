@@ -54,7 +54,7 @@ class PatrolSchedule {
 
 $scheduleObj = new PatrolSchedule($conn);
 
-// ✅ Get schedule ID
+
 $schedule_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $schedule = $scheduleObj->getScheduleById($schedule_id);
 
@@ -64,7 +64,7 @@ if (!$schedule) {
     exit();
 }
 
-// ✅ Handle update
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tanod_id = $_POST['tanod_id'];
     $area = $_POST['area'];

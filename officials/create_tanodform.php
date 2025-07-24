@@ -28,13 +28,33 @@ $error = $_GET['error'] ?? '';
 
   <form method="POST" action="create_tanod.php">
     <div class="mb-3">
-      <label>Full Name</label>
-      <input type="text" class="form-control" name="name" required>
+      <label>First Name</label>
+      <input type="text" class="form-control" name="fname" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Last Name</label>
+      <input type="text" class="form-control" name="lname" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Email</label>
+      <input type="email" class="form-control" name="email" required>
     </div>
 
     <div class="mb-3">
       <label>Contact Number</label>
       <input type="text" class="form-control" name="contact_number" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Purok</label>
+      <select class="form-control" name="purok" required>
+        <option value="">Select Purok</option>
+        <?php for ($i = 1; $i <= 7; $i++): ?>
+          <option value="Purok <?= $i ?>">Purok <?= $i ?></option>
+        <?php endfor; ?>
+      </select>
     </div>
 
     <div class="mb-3">

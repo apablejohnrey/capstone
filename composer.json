@@ -1,0 +1,6 @@
+{
+    "name": "johnrey/capstone",
+    "description": "Gmail login integration for PHP app",
+    "type": "project",
+    "require": {}
+}

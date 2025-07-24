@@ -7,12 +7,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'official') {
     exit();
 }
 
-// Verify Chairperson
 $db = new Database();
 $conn = $db->connect();
+
 $stmt = $conn->prepare("SELECT position FROM Barangay_Officials WHERE user_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $position = $stmt->fetchColumn();
+
 if (!$position || strtolower($position) !== 'chairperson') {
     echo "<p style='color:red;'>Access denied. Only the Captain can view this page.</p>";
     exit();
@@ -20,17 +21,18 @@ if (!$position || strtolower($position) !== 'chairperson') {
 
 class PatrolManager {
     private PDO $conn;
+
     public function __construct(PDO $conn) {
         $this->conn = $conn;
     }
 
     public function getTanods(): array {
-        $stmt = $this->conn->query("SELECT tanod_id, name FROM Tanods ORDER BY name ASC");
+        $stmt = $this->conn->query("SELECT tanod_id, CONCAT(fname, ' ', lname) AS name FROM Tanods ORDER BY fname ASC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getSchedules(array $filter = []): array {
-        $sql = "SELECT ps.*, t.name AS tanod_name 
+        $sql = "SELECT ps.*, CONCAT(t.fname, ' ', t.lname) AS tanod_name 
                 FROM Patrol_Schedule ps
                 JOIN Tanods t ON ps.tanod_id = t.tanod_id";
         $clauses = [];
@@ -65,7 +67,6 @@ class PatrolManager {
 
 $manager = new PatrolManager($conn);
 
-// ✅ Delete action
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $manager->deleteSchedule((int)$_GET['delete']);
     $_SESSION['success'] = "Patrol schedule deleted successfully.";
@@ -73,7 +74,6 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     exit();
 }
 
-// ✅ Filters
 $filters = [
     'tanod_id' => $_GET['tanod_id'] ?? '',
     'patrol_date' => $_GET['patrol_date'] ?? ''
@@ -101,7 +101,7 @@ $tanods = $manager->getTanods();
 <body>
 <?php include 'navofficial.php'; ?>
 
- <div class="main-content-wrapper">
+<div class="main-content-wrapper p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fas fa-calendar-check me-2"></i>Manage Patrol Schedules</h2>
         <div>
@@ -114,7 +114,6 @@ $tanods = $manager->getTanods();
         <div class="alert alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
     <?php endif; ?>
 
-    <!-- 🔍 Filter Form -->
     <form method="get" class="row g-3 mb-4">
         <div class="col-md-4">
             <label for="tanod_id" class="form-label">Filter by Tanod</label>
@@ -137,7 +136,6 @@ $tanods = $manager->getTanods();
         </div>
     </form>
 
-    <!-- 📋 Schedule Table -->
     <?php if (count($schedules)): ?>
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
